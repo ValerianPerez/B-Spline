@@ -17,7 +17,9 @@ public class Lines : MonoBehaviour
     /// <summary>
     /// The Vector of B-Spline
     /// </summary>
-    public Vector3[] nodeVector;
+    public int[] nodeVector;
+
+    public List<Vector3> spline;
 
     /// <summary>
     /// The renderer of B-Spline
@@ -27,7 +29,7 @@ public class Lines : MonoBehaviour
     /// <summary>
     /// The control points of b-spline
     /// </summary>
-    private List<Vector3> points;
+    private List<Vector3> controlPoints;
 
     /// <summary>
     /// The line renderer for control points
@@ -43,51 +45,66 @@ public class Lines : MonoBehaviour
     void Start()
     {
 
-        points = new List<Vector3>();
+        controlPoints = new List<Vector3>();
+        spline = new List<Vector3>();
 
         for (int i = 0; i < gameObject.transform.childCount; i++)
         {
-            points.Add(transform.GetChild(i).transform.position);
+            controlPoints.Add(transform.GetChild(i).transform.position);
         }
 
         ControlPointsRenderer = GetComponent<LineRenderer>();
-        ControlPointsRenderer.positionCount = points.Capacity;
-        ControlPointsRenderer.SetPositions(points.ToArray());
+        ControlPointsRenderer.positionCount = controlPoints.Capacity;
+        ControlPointsRenderer.SetPositions(controlPoints.ToArray());
 
-        segmentStep = 1 / NbSegments;
+        segmentStep = (float) 1 / NbSegments;
 
-        nodeVector = new Vector3[NbSegments * points.Capacity];
+        nodeVector = new int[n + controlPoints.Capacity + 1];
 
-        BSplineRenderer.SetPositions(BSpline());
+        int nodeNumber = 0;
+
+        for (int i = 0; i < nodeVector.Length; i++)
+        {
+            if (i > n && i <= controlPoints.Capacity)
+            {
+                nodeVector[i] = ++nodeNumber;
+            }
+            else
+            {
+                nodeVector[i] = nodeNumber;
+            }
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    /// <summary>
+    /// Refresh the B-Spline with the current control points
+    /// </summary>
+    public void RefreshBSpline()
     {
-
+        BSplineRenderer.SetPositions(BSpline());
     }
 
     /// <summary>
     /// Create the B-Spline with registered control points 
     /// </summary>
     /// <returns>Return the node vector of B-Spline</returns>
+    
     private Vector3[] BSpline()
     {
+        
         int index = 0;
-
-        for (int i = 0; i < n + points.Capacity; i++)
+        
+        for (int i = 0; i < controlPoints.Capacity ; i++)
         {
-            float t = i;
-            while (t < i + 1)
+            for (float t = i; t < i + 1; t += segmentStep)
             {
-                Debug.Log(t);
-                //nodeVector[index++] = DeBoor(n, i, t) * points[i];
-                t += segmentStep;
+                spline.Add(DeBoor(n, i, t));
             }
         }
-
-        return nodeVector;
+        return spline.ToArray();
+        
     }
+    
 
     /// <summary>
     /// The function which compute the deBoor factor
@@ -95,22 +112,22 @@ public class Lines : MonoBehaviour
     /// <param name="k">The degree of calculation</param>
     /// <param name="ti">The current node</param>
     /// <param name="t">The current time</param>
-    /// <returns></returns>
-    private float DeBoor(int k, int ti, float t)
+    /// <returns>Return the new point</returns>
+    private Vector3 DeBoor(int k, int ti, float t)
     {
         if (k == 0)
         {
-            if (ti < t && t < ti + 1)
-            {
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
+            //if (ti <= t && t < ti + 1)
+            //{
+                return controlPoints[ti];
+            //}
+            //else
+            //{
+                //return Vector3.zero;
+            //}
         }
 
-        float factor = (t - ti) / (k);
+        float factor = (t - nodeVector[ti]) / (nodeVector[ti + k] - nodeVector[ti]);
 
         return factor * DeBoor(k-1, ti, t) + (1-factor) * DeBoor(k-1, ti+1, t);
     }
