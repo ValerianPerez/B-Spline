@@ -57,7 +57,7 @@ public class Lines : MonoBehaviour
         ControlPointsRenderer.positionCount = controlPoints.Capacity;
         ControlPointsRenderer.SetPositions(controlPoints.ToArray());
 
-        segmentStep = (float) 1 / NbSegments;
+        segmentStep = (float)1 / NbSegments;
 
         nodeVector = new int[n + controlPoints.Capacity + 1];
 
@@ -88,23 +88,23 @@ public class Lines : MonoBehaviour
     /// Create the B-Spline with registered control points 
     /// </summary>
     /// <returns>Return the node vector of B-Spline</returns>
-    
+
     private Vector3[] BSpline()
     {
-        
+
         int index = 0;
-        
-        for (int i = 0; i < controlPoints.Capacity ; i++)
+
+        for (int i = 0; i < controlPoints.Capacity; i++)
         {
-            for (float t = i; t < i + 1; t += segmentStep)
+            for (float t = i + segmentStep; t < i + 1; t += segmentStep)
             {
-                spline.Add(DeBoor(n, i, t));
+                spline.Add(NewBSpline(t, n));
             }
         }
         return spline.ToArray();
-        
+
     }
-    
+
 
     /// <summary>
     /// The function which compute the deBoor factor
@@ -119,16 +119,62 @@ public class Lines : MonoBehaviour
         {
             //if (ti <= t && t < ti + 1)
             //{
-                return controlPoints[ti];
+            return controlPoints[ti];
             //}
             //else
             //{
-                //return Vector3.zero;
+            //return Vector3.zero;
             //}
         }
 
         float factor = (t - nodeVector[ti]) / (nodeVector[ti + k] - nodeVector[ti]);
 
-        return factor * DeBoor(k-1, ti, t) + (1-factor) * DeBoor(k-1, ti+1, t);
+        return factor * DeBoor(k - 1, ti, t) + (1 - factor) * DeBoor(k - 1, ti + 1, t);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="u"></param>
+    /// <param name="k"></param>
+    /// <returns></returns>
+    private Vector3 NewBSpline(float u, int k)
+    {
+        Vector3[] F = new Vector3[k];
+        int dec = 0;
+        //for (int i = k; u > nodeVector[i]; i++, dec++) ;
+        int index = k;
+        while (u > nodeVector[index])
+        {
+            index++;
+            dec++;
+        }
+
+        for (int i = 0; i < k; i++)
+        {
+            F[i] = controlPoints[dec + i];
+        }
+
+        int j = 0;
+        while (k > 0)
+        {
+            for (int i = 0; i < k - 1; i++)
+            {
+                Vector3 left = F[i];
+                Vector3 right = F[i + 1];
+
+                int min = nodeVector[dec + i + j + 1];
+                int max = nodeVector[dec + i + j + k];
+
+                float l_factor = (max - u) / (max - min);
+                float r_factor = (u - min) / (max - min);
+
+                F[i] = l_factor * left + r_factor * right;
+            }
+            j++;
+            k--;
+        }
+
+        return F[0];
     }
 }
