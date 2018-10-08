@@ -5,14 +5,14 @@ using UnityEngine;
 public class Lines : MonoBehaviour
 {
     /// <summary>
-    /// The curve's degree
+    /// The curve's order
     /// </summary>
-    public int n = 2;
+    public int k = 2;
 
     /// <summary>
-    /// The number of segments for each nodes
+    /// The number of point on the B-Spline
     /// </summary>
-    public int NbSegments = 10;
+    public int Resolution = 10;
 
     /// <summary>
     /// The Vector of B-Spline
@@ -29,6 +29,7 @@ public class Lines : MonoBehaviour
     /// <summary>
     /// The control points of b-spline
     /// </summary>
+    [SerializeField]
     private List<Vector3> controlPoints;
 
     /// <summary>
@@ -57,15 +58,15 @@ public class Lines : MonoBehaviour
         ControlPointsRenderer.positionCount = controlPoints.Capacity;
         ControlPointsRenderer.SetPositions(controlPoints.ToArray());
 
-        segmentStep = (float)1 / NbSegments;
+        segmentStep = (float)controlPoints.Capacity / Resolution;
 
-        nodeVector = new int[n + controlPoints.Capacity + 1];
-
-        int nodeNumber = 0;
+        nodeVector = new int[k + controlPoints.Capacity];
 
         for (int i = 0; i < nodeVector.Length; i++)
         {
-            if (i > n && i <= controlPoints.Capacity)
+            nodeVector[i] = i;
+            /*
+            if (i > k && i <= controlPoints.Capacity)
             {
                 nodeVector[i] = ++nodeNumber;
             }
@@ -73,6 +74,7 @@ public class Lines : MonoBehaviour
             {
                 nodeVector[i] = nodeNumber;
             }
+            */
         }
     }
 
@@ -88,18 +90,13 @@ public class Lines : MonoBehaviour
     /// Create the B-Spline with registered control points 
     /// </summary>
     /// <returns>Return the node vector of B-Spline</returns>
-
     private Vector3[] BSpline()
     {
-
-        int index = 0;
-
-        for (int i = 0; i < controlPoints.Capacity; i++)
+        for (float i = 0.0f; i < controlPoints.Capacity; i += segmentStep)
         {
-            for (float t = i + segmentStep; t < i + 1; t += segmentStep)
-            {
-                spline.Add(NewBSpline(t, n));
-            }
+            Vector3 p = NewBSpline(i);
+            spline.Add(p);
+            Debug.Log(p);
         }
         return spline.ToArray();
 
@@ -138,42 +135,46 @@ public class Lines : MonoBehaviour
     /// <param name="u"></param>
     /// <param name="k"></param>
     /// <returns></returns>
-    private Vector3 NewBSpline(float u, int k)
+    private Vector3 NewBSpline(float u)
     {
+
         Vector3[] F = new Vector3[k];
         int dec = 0;
-        //for (int i = k; u > nodeVector[i]; i++, dec++) ;
-        int index = k;
-        while (u > nodeVector[index])
-        {
-            index++;
-            dec++;
-        }
+        for (int i = k; u > nodeVector[i]; i++, dec++) ;
+        //int index = k;
+        //while (u > nodeVector[index])
+        //{
+        //    index++;
+        //    dec++;
+        //}
+
 
         for (int i = 0; i < k; i++)
         {
             F[i] = controlPoints[dec + i];
+                Debug.Log(F[0]);
         }
 
-        int j = 0;
-        while (k > 0)
+        //while (index > 0)
+        for (int j = k; j > 1; j--)
         {
-            for (int i = 0; i < k - 1; i++)
+            for (int i = 0; i < k-1; i++)
             {
                 Vector3 left = F[i];
                 Vector3 right = F[i + 1];
 
-                int min = nodeVector[dec + i + j + 1];
-                int max = nodeVector[dec + i + j + k];
+                int min = nodeVector[dec + j + 1];
+                int max = nodeVector[dec + j + i];
 
                 float l_factor = (max - u) / (max - min);
                 float r_factor = (u - min) / (max - min);
 
+
                 F[i] = l_factor * left + r_factor * right;
             }
-            j++;
-            k--;
+            dec++;
         }
+
 
         return F[0];
     }
