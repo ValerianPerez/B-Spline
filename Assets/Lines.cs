@@ -65,16 +65,6 @@ public class Lines : MonoBehaviour
         for (int i = 0; i < nodeVector.Length; i++)
         {
             nodeVector[i] = i;
-            /*
-            if (i > k && i <= controlPoints.Capacity)
-            {
-                nodeVector[i] = ++nodeNumber;
-            }
-            else
-            {
-                nodeVector[i] = nodeNumber;
-            }
-            */
         }
     }
 
@@ -83,7 +73,9 @@ public class Lines : MonoBehaviour
     /// </summary>
     public void RefreshBSpline()
     {
-        BSplineRenderer.SetPositions(BSpline());
+        Vector3[] bSpline = BSpline();
+        BSplineRenderer.positionCount = bSpline.Length;
+        BSplineRenderer.SetPositions(bSpline);
     }
 
     /// <summary>
@@ -94,77 +86,40 @@ public class Lines : MonoBehaviour
     {
         for (float i = 0.0f; i < controlPoints.Capacity; i += segmentStep)
         {
-            Vector3 p = NewBSpline(i);
-            spline.Add(p);
-            Debug.Log(p);
+            spline.Add(CreateBSpline(i));
         }
         return spline.ToArray();
-
-    }
-
-
-    /// <summary>
-    /// The function which compute the deBoor factor
-    /// </summary>
-    /// <param name="k">The degree of calculation</param>
-    /// <param name="ti">The current node</param>
-    /// <param name="t">The current time</param>
-    /// <returns>Return the new point</returns>
-    private Vector3 DeBoor(int k, int ti, float t)
-    {
-        if (k == 0)
-        {
-            //if (ti <= t && t < ti + 1)
-            //{
-            return controlPoints[ti];
-            //}
-            //else
-            //{
-            //return Vector3.zero;
-            //}
-        }
-
-        float factor = (t - nodeVector[ti]) / (nodeVector[ti + k] - nodeVector[ti]);
-
-        return factor * DeBoor(k - 1, ti, t) + (1 - factor) * DeBoor(k - 1, ti + 1, t);
     }
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="u"></param>
-    /// <param name="k"></param>
     /// <returns></returns>
-    private Vector3 NewBSpline(float u)
+    private Vector3 CreateBSpline(float u)
     {
 
         Vector3[] F = new Vector3[k];
         int dec = 0;
-        for (int i = k; u > nodeVector[i]; i++, dec++) ;
-        //int index = k;
-        //while (u > nodeVector[index])
-        //{
-        //    index++;
-        //    dec++;
-        //}
 
+        for (int i = k-1; u > nodeVector[i]; i++, dec++) ;
 
         for (int i = 0; i < k; i++)
         {
             F[i] = controlPoints[dec + i];
-                Debug.Log(F[0]);
         }
 
         //while (index > 0)
         for (int j = k; j > 1; j--)
         {
+            int min, max;
             for (int i = 0; i < k-1; i++)
             {
                 Vector3 left = F[i];
                 Vector3 right = F[i + 1];
 
-                int min = nodeVector[dec + j + 1];
-                int max = nodeVector[dec + j + i];
+                min = nodeVector[dec + i + 1];
+                max = nodeVector[dec + j + i];
 
                 float l_factor = (max - u) / (max - min);
                 float r_factor = (u - min) / (max - min);

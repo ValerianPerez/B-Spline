@@ -704,10 +704,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   k: 3
-  Resolution: 10
+  Resolution: 500
   nodeVector: 
   spline: []
   BSplineRenderer: {fileID: 1656442273}
+  controlPoints: []
 --- !u!120 &785100875
 LineRenderer:
   m_ObjectHideFlags: 0
