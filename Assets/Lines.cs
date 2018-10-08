@@ -19,12 +19,20 @@ public class Lines : MonoBehaviour
     /// </summary>
     public int[] nodeVector;
 
-    public List<Vector3> spline;
+    /// <summary>
+    /// The tmp spline
+    /// </summary>
+    public List<Vector3> Spline;
+
+    /// <summary>
+    /// The B-Spline object
+    /// </summary>
+    public GameObject BSplineObject;
 
     /// <summary>
     /// The renderer of B-Spline
     /// </summary>
-    public LineRenderer BSplineRenderer;
+    private LineRenderer BSplineRenderer;
 
     /// <summary>
     /// The control points of b-spline
@@ -45,9 +53,10 @@ public class Lines : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        BSplineRenderer = Instantiate(BSplineObject).GetComponent<LineRenderer>();
 
         controlPoints = new List<Vector3>();
-        spline = new List<Vector3>();
+        Spline = new List<Vector3>();
 
         for (int i = 0; i < gameObject.transform.childCount; i++)
         {
@@ -86,9 +95,9 @@ public class Lines : MonoBehaviour
     {
         for (float i = k-1; i < controlPoints.Capacity; i += segmentStep)
         {
-            spline.Add(CreateBSpline(i));
+            Spline.Add(CreateBSpline(i));
         }
-        return spline.ToArray();
+        return Spline.ToArray();
     }
 
     /// <summary>
@@ -102,8 +111,6 @@ public class Lines : MonoBehaviour
         int dec = 0;
         
         for (int i = k; u > nodeVector[i]; i++, dec++);
-
-        Debug.Log(dec);
 
         for (int i = 0; i < k; i++)
         {
