@@ -703,7 +703,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54c699ebad1971c4785e87d5cd191d27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  k: 3
+  k: 2
   Resolution: 500
   nodeVector: 
   spline: []

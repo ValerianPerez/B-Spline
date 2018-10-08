@@ -84,7 +84,7 @@ public class Lines : MonoBehaviour
     /// <returns>Return the node vector of B-Spline</returns>
     private Vector3[] BSpline()
     {
-        for (float i = 0.0f; i < controlPoints.Capacity; i += segmentStep)
+        for (float i = k-1; i < controlPoints.Capacity; i += segmentStep)
         {
             spline.Add(CreateBSpline(i));
         }
@@ -98,38 +98,35 @@ public class Lines : MonoBehaviour
     /// <returns></returns>
     private Vector3 CreateBSpline(float u)
     {
-
         Vector3[] F = new Vector3[k];
         int dec = 0;
+        
+        for (int i = k; u > nodeVector[i]; i++, dec++);
 
-        for (int i = k-1; u > nodeVector[i]; i++, dec++) ;
+        Debug.Log(dec);
 
         for (int i = 0; i < k; i++)
         {
             F[i] = controlPoints[dec + i];
         }
 
-        //while (index > 0)
         for (int j = k; j > 1; j--)
         {
-            int min, max;
             for (int i = 0; i < k-1; i++)
             {
                 Vector3 left = F[i];
                 Vector3 right = F[i + 1];
 
-                min = nodeVector[dec + i + 1];
-                max = nodeVector[dec + j + i];
+                int min = nodeVector[dec + i + 1];
+                int max = nodeVector[dec + j + i];
 
                 float l_factor = (max - u) / (max - min);
                 float r_factor = (u - min) / (max - min);
-
 
                 F[i] = l_factor * left + r_factor * right;
             }
             dec++;
         }
-
 
         return F[0];
     }
