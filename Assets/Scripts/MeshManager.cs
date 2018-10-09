@@ -43,13 +43,12 @@ public class MeshManager : MonoBehaviour {
 	void Start () {
         lines = new List<Lines>();
         mesh = new List<List<Vector3>>();
-        UseOpenNodalVector = true;
+        UseOpenNodalVector = false;
 
         foreach (Lines item in GetComponentsInChildren<Lines>())
         {
             item.Setup(k, Resolution, UseOpenNodalVector);
             lines.Add(item);
-            mesh.Add(item.ControlPoints);
         }
 	}
 	
@@ -66,22 +65,23 @@ public class MeshManager : MonoBehaviour {
         foreach (Lines item in lines)
         {
             item.RefreshBSpline();
+            mesh.Add(item.GetSplinePoints());
         }
 
-        //for (int i = 0; i < mesh[0].Capacity; i++)
-        //{
-        //    List<Vector3> cp = new List<Vector3>();
+        for (int i = 0; i < mesh[0].Capacity; i++)
+        {
+            List<Vector3> cp = new List<Vector3>();
 
-        //    for (int j = 0; j < mesh.Capacity; j++)
-        //    {
-        //        cp.Add(mesh[j][i]);
-        //    }
+            for (int j = 0; j < mesh.Capacity; j++)
+            {
+                cp.Add(mesh[i][j]);
+            }
 
-        //    BSpline bSpline = new BSpline(k, Resolution, cp);
-        //    //Create an empty line renderer
-        //    BSplineRenderer = Instantiate(BSplineObject).GetComponent<LineRenderer>();
-        //    BSplineRenderer.positionCount = cp.Capacity;
-        //    BSplineRenderer.SetPositions(bSpline.Generate());
-        //}
+            BSpline bSpline = new BSpline(k, Resolution, cp, UseOpenNodalVector);
+            //Create an empty line renderer
+            BSplineRenderer = Instantiate(BSplineObject).GetComponent<LineRenderer>();
+            BSplineRenderer.positionCount = cp.Capacity;
+            BSplineRenderer.SetPositions(bSpline.Generate());
+        }
     }
 }

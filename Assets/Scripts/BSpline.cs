@@ -5,6 +5,11 @@ using UnityEngine;
 public class BSpline
 {
     /// <summary>
+    /// The tmp spline
+    /// </summary>
+    public List<Vector3> Spline { get; private set; }
+
+    /// <summary>
     /// Define if the open nodal vector is used or not
     /// </summary>
     private bool isOpenNodalVector;
@@ -30,11 +35,6 @@ public class BSpline
     private List<Vector3> controlPoints;
 
     /// <summary>
-    /// The tmp spline
-    /// </summary>
-    private List<Vector3> Spline;
-
-    /// <summary>
     /// The step for segmentation
     /// </summary>
     private readonly float segmentStep;
@@ -54,7 +54,6 @@ public class BSpline
 
         Spline = new List<Vector3>();
 
-
         segmentStep = (float)controlPoints.Capacity / Resolution;
         nodeVector = new int[k + controlPoints.Capacity];
 
@@ -63,7 +62,7 @@ public class BSpline
         {
             if (isOpenNodalVector)
             {
-                if (i > k - 1 && i < nodeVector.Length - k)
+                if (i > k - 1 && i < controlPoints.Capacity+1)
                 {
                     nodeNumber++;
                 }
@@ -73,10 +72,9 @@ public class BSpline
             {
                 nodeVector[i] = i;
             }
-            /*/
-            //*/
+            
         }
-    }
+    }    
 
     /// <summary>
     /// Create the B-Spline with registered control points 
@@ -86,7 +84,6 @@ public class BSpline
     {
         for (float u = nodeVector[k - 1]; u < nodeVector[controlPoints.Capacity]; u += segmentStep)
         {
-            Debug.Log(u);
             Spline.Add(CreateBSpline(u));
         }
         return Spline.ToArray();

@@ -53,7 +53,7 @@ public class Lines : MonoBehaviour
     {
         this.k = k;
         this.resolution = resolution;
-        this.UseOpenNodalVector = UseOpenNodalVector;
+        this.UseOpenNodalVector = useOpenNodalVector;
 
         //Create an empty line renderer
         BSplineRenderer = Instantiate(BSplineObject).GetComponent<LineRenderer>();
@@ -85,4 +85,12 @@ public class Lines : MonoBehaviour
         BSplineRenderer.SetPositions(bSpline);
     }
 
+    /// <summary>
+    /// Return the points of spline
+    /// </summary>
+    /// <returns>List of points of spline</returns>
+    public List<Vector3> GetSplinePoints()
+    {
+        return CustomBSpline.Spline;
+    }
 }
