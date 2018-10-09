@@ -54,15 +54,15 @@ public class BSpline
 
         Spline = new List<Vector3>();
 
-        segmentStep = (float)controlPoints.Capacity / Resolution;
-        nodeVector = new int[k + controlPoints.Capacity];
+        segmentStep = (float)controlPoints.Count / Resolution;
+        nodeVector = new int[k + controlPoints.Count];
 
         int nodeNumber = 0;
         for (int i = 0; i < nodeVector.Length; i++)
         {
             if (isOpenNodalVector)
             {
-                if (i > k - 1 && i < controlPoints.Capacity+1)
+                if (i > k - 1 && i < controlPoints.Count+1)
                 {
                     nodeNumber++;
                 }
@@ -82,7 +82,7 @@ public class BSpline
     /// <returns>Return the discrete position of B-Spline</returns>
     public Vector3[] Generate()
     {
-        for (float u = nodeVector[k - 1]; u < nodeVector[controlPoints.Capacity]; u += segmentStep)
+        for (float u = nodeVector[k - 1]; u < nodeVector[controlPoints.Count]; u += segmentStep)
         {
             Spline.Add(CreateBSpline(u));
         }

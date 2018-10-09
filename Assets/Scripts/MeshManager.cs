@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MeshManager : MonoBehaviour {
+public class MeshManager : MonoBehaviour
+{
 
     /// <summary>
     /// The curve's order
@@ -39,23 +40,25 @@ public class MeshManager : MonoBehaviour {
     /// </summary>
     private List<List<Vector3>> mesh;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
         lines = new List<Lines>();
         mesh = new List<List<Vector3>>();
-        UseOpenNodalVector = false;
+        UseOpenNodalVector = true;
 
         foreach (Lines item in GetComponentsInChildren<Lines>())
         {
             item.Setup(k, Resolution, UseOpenNodalVector);
             lines.Add(item);
         }
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
 
     /// <summary>
     /// Generate all B-splines
@@ -68,20 +71,24 @@ public class MeshManager : MonoBehaviour {
             mesh.Add(item.GetSplinePoints());
         }
 
-        for (int i = 0; i < mesh[0].Capacity; i++)
+
+        for (int i = 0; i < mesh[0].Count; i++)
         {
+
             List<Vector3> cp = new List<Vector3>();
 
-            for (int j = 0; j < mesh.Capacity; j++)
+            for (int j = 0; j < mesh.Count; j++)
             {
-                cp.Add(mesh[i][j]);
+                cp.Add(mesh[j][i]);
             }
 
             BSpline bSpline = new BSpline(k, Resolution, cp, UseOpenNodalVector);
+
             //Create an empty line renderer
             BSplineRenderer = Instantiate(BSplineObject).GetComponent<LineRenderer>();
-            BSplineRenderer.positionCount = cp.Capacity;
-            BSplineRenderer.SetPositions(bSpline.Generate());
+            Vector3[] tmp = bSpline.Generate();
+            BSplineRenderer.positionCount = tmp.Length;
+            BSplineRenderer.SetPositions(tmp);
         }
     }
 }

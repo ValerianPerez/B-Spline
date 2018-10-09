@@ -68,7 +68,7 @@ public class Lines : MonoBehaviour
 
         //Set the control polygon
         ControlPointsRenderer = GetComponent<LineRenderer>();
-        ControlPointsRenderer.positionCount = ControlPoints.Capacity;
+        ControlPointsRenderer.positionCount = ControlPoints.Count;
         ControlPointsRenderer.SetPositions(ControlPoints.ToArray());
 
         //Create a new BSpline class
