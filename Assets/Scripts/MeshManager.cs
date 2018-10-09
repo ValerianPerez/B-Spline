@@ -40,11 +40,17 @@ public class MeshManager : MonoBehaviour
     /// </summary>
     private List<List<Vector3>> meshPoints;
 
+    private List<Vector3> vertices;
+
+    private List<int> triangles;
+
     // Use this for initialization
     void Start()
     {
         lines = new List<Lines>();
         meshPoints = new List<List<Vector3>>();
+        vertices = new List<Vector3>();
+        triangles = new List<int>();
         UseOpenNodalVector = true;
 
         foreach (Lines item in GetComponentsInChildren<Lines>())
@@ -84,11 +90,13 @@ public class MeshManager : MonoBehaviour
 
             BSpline bSpline = new BSpline(k, Resolution, cp, UseOpenNodalVector);
 
+            vertices.AddRange(bSpline.Generate());
+
             //Create a line renderer
-            BSplineRenderer = Instantiate(BSplineObject).GetComponent<LineRenderer>();
-            Vector3[] tmp = bSpline.Generate();
-            BSplineRenderer.positionCount = tmp.Length;
-            BSplineRenderer.SetPositions(tmp);
+            //BSplineRenderer = Instantiate(BSplineObject).GetComponent<LineRenderer>();
+            //Vector3[] tmp = bSpline.Generate();
+            //BSplineRenderer.positionCount = tmp.Length;
+            //BSplineRenderer.SetPositions(tmp);
         }
 
         CreateMesh();
@@ -103,12 +111,45 @@ public class MeshManager : MonoBehaviour
         Mesh mesh = new Mesh();
         meshFilter.mesh = mesh;
 
-        for (int i = 0; i < meshPoints.Count - 1; i++)
-        {
-            for (int j = 0; j < meshPoints[i].Count - 1; j++)
-            {
+        //Make a unique list of points
+        //for (int i = 0; i < meshPoints.Count - 1; i++)
+        //{
+        //    for (int j = 0; j < meshPoints[i].Count - 1; j++)
+        //    {
+        //        vertices.Add(meshPoints[i][j]);
+        //    }
+        //}
 
+        TriangulateMesh();
+        mesh.vertices = vertices.ToArray();
+        mesh.triangles = triangles.ToArray();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    void TriangulateMesh()
+    {
+        int width = meshPoints.Count;
+        int length = meshPoints[0].Count;
+
+        // Creating top surface
+        for (int x = 0; x < width - 1; x++)
+        {
+            for (int y = 0; y < length - 1; y++)
+            {
+                // Add first triangle (supposedly top)
+                triangles.Add(x * length + y);
+                triangles.Add(x * length + y + 1);
+                triangles.Add((width * length) + x * (length - 1) + y);
+
+                // Third triangle (supposedly right)
+                triangles.Add(x * length + y + 1);
+                triangles.Add((x + 1) * length + y + 1);
+                triangles.Add((width * length) + x * (length - 1) + y);
             }
         }
+
+
     }
 }
