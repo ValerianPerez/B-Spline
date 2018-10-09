@@ -10,14 +10,19 @@ public class Lines : MonoBehaviour
     public List<Vector3> ControlPoints { get; private set; }
 
     /// <summary>
+    /// Define if the open nodal vector is used or not
+    /// </summary>
+    public bool UseOpenNodalVector { get; private set; }
+
+    /// <summary>
     /// The curve's order
     /// </summary>
-    public int k = 2;
+    private int k;
 
     /// <summary>
     /// The number of point on the B-Spline
     /// </summary>
-    public int Resolution = 10;
+    private int resolution;
 
     /// <summary>
     /// The B-Spline object
@@ -39,9 +44,17 @@ public class Lines : MonoBehaviour
     /// </summary>
     private BSpline CustomBSpline;
 
-    // Use this for initialization
-    void Start()
+    /// <summary>
+    /// Set up the lines of control points
+    /// </summary>
+    /// <param name="k">the order of the curve</param>
+    /// <param name="resolution">The number of points in curve</param>
+    public void Setup(int k, int resolution, bool useOpenNodalVector)
     {
+        this.k = k;
+        this.resolution = resolution;
+        this.UseOpenNodalVector = UseOpenNodalVector;
+
         //Create an empty line renderer
         BSplineRenderer = Instantiate(BSplineObject).GetComponent<LineRenderer>();
         BSplineRenderer.positionCount = 0;
@@ -59,7 +72,7 @@ public class Lines : MonoBehaviour
         ControlPointsRenderer.SetPositions(ControlPoints.ToArray());
 
         //Create a new BSpline class
-        CustomBSpline = new BSpline(k, Resolution, ControlPoints);
+        CustomBSpline = new BSpline(k, resolution, ControlPoints, UseOpenNodalVector);
     }
 
     /// <summary>

@@ -2,7 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BSpline  {
+public class BSpline
+{
+    /// <summary>
+    /// Define if the open nodal vector is used or not
+    /// </summary>
+    private bool isOpenNodalVector;
+
     /// <summary>
     /// The curve's order
     /// </summary>
@@ -31,7 +37,7 @@ public class BSpline  {
     /// <summary>
     /// The step for segmentation
     /// </summary>
-    private float segmentStep;
+    private readonly float segmentStep;
 
     /// <summary>
     /// The constructir for the BSpline
@@ -39,33 +45,49 @@ public class BSpline  {
     /// <param name="k">Degree of curve</param>
     /// <param name="Resolution">Number of points</param>
     /// <param name="controlPoints">List of control points positions</param>
-    public BSpline(int k, int Resolution, List<Vector3> controlPoints)
+    public BSpline(int k, int Resolution, List<Vector3> controlPoints, bool isOpenNodalVector)
     {
         this.controlPoints = controlPoints;
         this.Resolution = Resolution;
         this.k = k;
+        this.isOpenNodalVector = isOpenNodalVector;
 
         Spline = new List<Vector3>();
 
-        segmentStep = (float)controlPoints.Capacity / Resolution;
 
+        segmentStep = (float)controlPoints.Capacity / Resolution;
         nodeVector = new int[k + controlPoints.Capacity];
 
+        int nodeNumber = 0;
         for (int i = 0; i < nodeVector.Length; i++)
         {
-            nodeVector[i] = i;
+            if (isOpenNodalVector)
+            {
+                if (i > k - 1 && i < nodeVector.Length - k)
+                {
+                    nodeNumber++;
+                }
+                nodeVector[i] = nodeNumber;
+            }
+            else
+            {
+                nodeVector[i] = i;
+            }
+            /*/
+            //*/
         }
     }
 
     /// <summary>
     /// Create the B-Spline with registered control points 
     /// </summary>
-    /// <returns>Return the node vector of B-Spline</returns>
+    /// <returns>Return the discrete position of B-Spline</returns>
     public Vector3[] Generate()
     {
-        for (float i = k-1; i < controlPoints.Capacity; i += segmentStep)
+        for (float u = nodeVector[k - 1]; u < nodeVector[controlPoints.Capacity]; u += segmentStep)
         {
-            Spline.Add(CreateBSpline(i));
+            Debug.Log(u);
+            Spline.Add(CreateBSpline(u));
         }
         return Spline.ToArray();
     }
@@ -79,8 +101,8 @@ public class BSpline  {
     {
         Vector3[] F = new Vector3[k];
         int dec = 0;
-        
-        for (int i = k; u > nodeVector[i]; i++, dec++);
+
+        for (int i = k; u > nodeVector[i]; i++, dec++) ;
 
         for (int i = 0; i < k; i++)
         {
@@ -89,7 +111,7 @@ public class BSpline  {
 
         for (int j = k; j > 1; j--)
         {
-            for (int i = 0; i < k-1; i++)
+            for (int i = 0; i < k - 1; i++)
             {
                 Vector3 left = F[i];
                 Vector3 right = F[i + 1];
