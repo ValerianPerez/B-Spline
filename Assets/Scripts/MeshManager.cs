@@ -38,13 +38,13 @@ public class MeshManager : MonoBehaviour
     /// <summary>
     /// The 2D List of mesh control points
     /// </summary>
-    private List<List<Vector3>> mesh;
+    private List<List<Vector3>> meshPoints;
 
     // Use this for initialization
     void Start()
     {
         lines = new List<Lines>();
-        mesh = new List<List<Vector3>>();
+        meshPoints = new List<List<Vector3>>();
         UseOpenNodalVector = true;
 
         foreach (Lines item in GetComponentsInChildren<Lines>())
@@ -68,27 +68,47 @@ public class MeshManager : MonoBehaviour
         foreach (Lines item in lines)
         {
             item.RefreshBSpline();
-            mesh.Add(item.GetSplinePoints());
+            meshPoints.Add(item.GetSplinePoints());
         }
 
 
-        for (int i = 0; i < mesh[0].Count; i++)
+        for (int i = 0; i < meshPoints[0].Count; i++)
         {
 
             List<Vector3> cp = new List<Vector3>();
 
-            for (int j = 0; j < mesh.Count; j++)
+            for (int j = 0; j < meshPoints.Count; j++)
             {
-                cp.Add(mesh[j][i]);
+                cp.Add(meshPoints[j][i]);
             }
 
             BSpline bSpline = new BSpline(k, Resolution, cp, UseOpenNodalVector);
 
-            //Create an empty line renderer
+            //Create a line renderer
             BSplineRenderer = Instantiate(BSplineObject).GetComponent<LineRenderer>();
             Vector3[] tmp = bSpline.Generate();
             BSplineRenderer.positionCount = tmp.Length;
             BSplineRenderer.SetPositions(tmp);
+        }
+
+        CreateMesh();
+    }
+
+    /// <summary>
+    /// Create the mesh from points of mesh
+    /// </summary>
+    private void CreateMesh()
+    {
+        MeshFilter meshFilter = GetComponent<MeshFilter>();
+        Mesh mesh = new Mesh();
+        meshFilter.mesh = mesh;
+
+        for (int i = 0; i < meshPoints.Count - 1; i++)
+        {
+            for (int j = 0; j < meshPoints[i].Count - 1; j++)
+            {
+
+            }
         }
     }
 }

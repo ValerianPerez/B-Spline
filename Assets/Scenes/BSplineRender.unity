@@ -1637,6 +1637,7 @@ GameObject:
   - component: {fileID: 534669905}
   - component: {fileID: 534669904}
   - component: {fileID: 534669903}
+  - component: {fileID: 534669906}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: Untagged
@@ -1704,6 +1705,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &534669906
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 534669902}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa2f435e3e666eb49850595882fff690, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &539337343
 Prefab:
   m_ObjectHideFlags: 0
@@ -2651,6 +2663,7 @@ GameObject:
   m_Component:
   - component: {fileID: 886565127}
   - component: {fileID: 886565128}
+  - component: {fileID: 886565129}
   m_Layer: 0
   m_Name: Mesh
   m_TagString: Untagged
@@ -2694,6 +2707,13 @@ MonoBehaviour:
   Resolution: 500
   BSplineObject: {fileID: 1905195619830376, guid: 0b785478ab204934896870ed19bdc1d2,
     type: 2}
+--- !u!33 &886565129
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 886565126}
+  m_Mesh: {fileID: 0}
 --- !u!1001 &900459852
 Prefab:
   m_ObjectHideFlags: 0
