@@ -45,10 +45,10 @@ public class BSpline
     /// <param name="k">Degree of curve</param>
     /// <param name="Resolution">Number of points</param>
     /// <param name="controlPoints">List of control points positions</param>
-    public BSpline(int k, int Resolution, List<Vector3> controlPoints, bool isOpenNodalVector)
+    public BSpline(int k, int resolution, List<Vector3> controlPoints, bool isOpenNodalVector)
     {
         this.controlPoints = controlPoints;
-        this.Resolution = Resolution;
+        this.Resolution = resolution;
         this.k = k;
         this.isOpenNodalVector = isOpenNodalVector;
 
@@ -60,7 +60,7 @@ public class BSpline
         int nodeNumber = 0;
         for (int i = 0; i < nodeVector.Length; i++)
         {
-            if (isOpenNodalVector)
+            if (this.isOpenNodalVector)
             {
                 if (i > k - 1 && i < controlPoints.Count+1)
                 {

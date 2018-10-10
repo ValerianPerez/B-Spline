@@ -71,8 +71,6 @@ public class Lines : MonoBehaviour
         ControlPointsRenderer.positionCount = ControlPoints.Count;
         ControlPointsRenderer.SetPositions(ControlPoints.ToArray());
 
-        //Create a new BSpline class
-        CustomBSpline = new BSpline(k, resolution, ControlPoints, UseOpenNodalVector);
     }
 
     /// <summary>
@@ -80,6 +78,11 @@ public class Lines : MonoBehaviour
     /// </summary>
     public void RefreshBSpline()
     {
+        //Create a new BSpline class
+        CustomBSpline = new BSpline(k, resolution, ControlPoints, UseOpenNodalVector);
+        //Clear the line renderer
+        BSplineRenderer.positionCount = 0;
+
         Vector3[] bSpline = CustomBSpline.Generate();
         BSplineRenderer.positionCount = bSpline.Length;
         BSplineRenderer.SetPositions(bSpline);
@@ -92,5 +95,23 @@ public class Lines : MonoBehaviour
     public List<Vector3> GetSplinePoints()
     {
         return CustomBSpline.Spline;
+    }
+
+    /// <summary>
+    /// Update the curve order
+    /// </summary>
+    /// <param name="order"></param>
+    public void UpdateOrder(int order)
+    {
+        this.k = order;
+    }
+
+    /// <summary>
+    /// Update the curve resolution
+    /// </summary>
+    /// <param name="resolution"></param>
+    public void UpdateResolution(int resolution)
+    {
+        this.resolution = resolution;
     }
 }

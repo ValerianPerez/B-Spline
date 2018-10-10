@@ -60,12 +60,6 @@ public class MeshManager : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     /// <summary>
     /// Generate all B-splines
     /// </summary>
@@ -76,7 +70,6 @@ public class MeshManager : MonoBehaviour
             item.RefreshBSpline();
             meshPoints.Add(item.GetSplinePoints());
         }
-
 
         for (int i = 0; i < meshPoints[0].Count; i++)
         {
@@ -93,13 +86,14 @@ public class MeshManager : MonoBehaviour
             vertices.AddRange(bSpline.Generate());
 
             //Create a line renderer
-            //BSplineRenderer = Instantiate(BSplineObject).GetComponent<LineRenderer>();
-            //Vector3[] tmp = bSpline.Generate();
-            //BSplineRenderer.positionCount = tmp.Length;
-            //BSplineRenderer.SetPositions(tmp);
+            BSplineRenderer = Instantiate(BSplineObject).GetComponent<LineRenderer>();
+
+            Vector3[] tmp = bSpline.Generate();
+            BSplineRenderer.positionCount = tmp.Length;
+            BSplineRenderer.SetPositions(tmp);
         }
 
-        CreateMesh();
+        //CreateMesh();
     }
 
     /// <summary>
@@ -126,7 +120,7 @@ public class MeshManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    /// Compute face of triangles
     /// </summary>
     void TriangulateMesh()
     {
@@ -149,7 +143,41 @@ public class MeshManager : MonoBehaviour
                 triangles.Add((width * length) + x * (length - 1) + y);
             }
         }
+    }
 
+    /// <summary>
+    /// Update the curve order
+    /// </summary>
+    /// <param name="order">The new degree of curve</param>
+    public void UpdateOrder(string order)
+    {
+        int int_order = int.Parse(order);
+        if (int_order != 0)
+        {
+            this.k = int_order;
+        }
 
+        foreach (Lines item in GetComponentsInChildren<Lines>())
+        {
+            item.UpdateOrder(int_order);
+        }
+    }
+
+    /// <summary>
+    /// Update the curve resolution
+    /// </summary>
+    /// <param name="resolution"></param>
+    public void UpdateResolution(string resolution)
+    {
+        int int_res = int.Parse(resolution);
+        if (int_res > 0)
+        {
+            this.Resolution = int_res;
+        }
+
+        foreach (Lines item in GetComponentsInChildren<Lines>())
+        {
+            item.UpdateResolution(int_res);
+        }
     }
 }
